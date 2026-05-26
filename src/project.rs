@@ -24,10 +24,11 @@ impl ProjectInfo {
         if let Some(common_dir) = run_git(&["rev-parse", "--git-common-dir"]) {
             let path = PathBuf::from(common_dir);
             if path.is_absolute() {
-                return path.parent().map(|p| p.to_path_buf());
-            }
-            if let Some(root) = &self.root {
-                return Some(root.join(&path).parent()?.to_path_buf());
+                return self.root.clone();
+            } else if let Some(root) = &self.root {
+                if let Some(parent) = root.join(&path).parent() {
+                    return Some(parent.to_path_buf());
+                }
             }
         }
         self.root.clone()
